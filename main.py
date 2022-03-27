@@ -2,8 +2,8 @@
 import json
 from gettext import find
 from io import BytesIO
+import telebot  # pyTelegramBotAPI	4.3.1
 
-import telebot  # pyTelegramBotAPI 4.3.1
 from telebot import types
 import requests
 import bs4   #beautifulsoup4
@@ -11,7 +11,7 @@ import BotGames  # бот-игры, файл BotGames.py
 from menuBot import Menu  # в этом модуле есть код, создающий экземпляры классов описывающих моё меню
 import DZ  # домашнее задание от первого урока
 
-bot = telebot.TeleBot('5207758409:AAGJ5MVwNBkinpzp6PDCyOVNCxODByUsO-4')  # Создаем экземпляр бота
+bot = telebot.TeleBot('5285865621:AAHtiMAGGb4VRe-CLCtHFpR4cTTJENbzZRk')  # Создаем экземпляр бота
 game21 = None  # класс игры в 21, экземпляр создаём только при начале игры
 
 
