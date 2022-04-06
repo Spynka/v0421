@@ -44,6 +44,9 @@ def get_text_messages(message):
         elif ms_text == "Прислать собаку":
             bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
 
+        elif ms_text == "Прислать идею стартапа":
+            bot.send_message(chat_id, text=get_startup())
+
         elif ms_text == "Прислать анекдот":
             bot.send_message(chat_id, text=get_anekdot())
 
@@ -138,7 +141,7 @@ def getMediaCards(game21):
 # -----------------------------------------------------------------------
 def send_help(chat_id):
     global bot
-    bot.send_message(chat_id, "Автор: ВладиSlave")
+    bot.send_message(chat_id, "Автор: Ксения Spynka Смирнова")
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(text="Напишите автору", url="https://t.me/BIaDISlav")
     markup.add(btn1)
@@ -183,6 +186,16 @@ def get_dogURL():
         url = r_json['url']
         # url.split("/")[-1]
     return url
+# ---------------------------------------------------------------------
+def get_startup():
+    array_startup = []
+    req = requests.get('http://itsthisforthat.com/api.php?json')
+    if req.status_code == 200:
+        r1_json = req.json()
+        a = r1_json['']
+    return ""
+
+
 # -----------------------------------------------------------------------
 def get_ManOrNot(chat_id):
     global bot
