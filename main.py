@@ -143,7 +143,7 @@ def send_help(chat_id):
     global bot
     bot.send_message(chat_id, "Автор: Ксения Spynka Смирнова")
     markup = types.InlineKeyboardMarkup()
-    btn1 = types.InlineKeyboardButton(text="Напишите автору", url="https://t.me/BIaDISlav")
+    btn1 = types.InlineKeyboardButton(text="Напишите автору", url="https://t.me/Spunka")
     markup.add(btn1)
     img = open('AVA.jpg', 'rb')
     bot.send_photo(chat_id, img, reply_markup=markup)
