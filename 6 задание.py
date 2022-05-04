@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser(description='A tutorial of argparse')
 parser.add_argument('-n', '--name', nargs='?', default='Anonymous', help="Here's your name")
 parser.add_argument('-p', '--path', help="Here's the path to your file")
 parser.add_argument('-nQ', '--noQ', action="store_true", help="No more questions, mate")
-parser.add_argument('-cF', '--crFile', action="store_true", help="Do u want to create file! ")
+parser.add_argument('-cF', '--crFile', action="store_true", help="Do u want to create file? ")
 args = parser.parse_args()
 
 # --------------------------------------------------------------------------------
