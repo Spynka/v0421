@@ -13,3 +13,8 @@ else:
 obj1 = obj_list[0]
 obj2 = obj_list[1]
 print(obj2.par2)
+<<<<<<< HEAD
+=======
+#asaa
+#fhnfhn
+>>>>>>> origin/main

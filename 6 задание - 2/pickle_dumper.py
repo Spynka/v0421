@@ -5,7 +5,11 @@ import class_file
 
 
 parser = argparse.ArgumentParser(description='Сериализуем объекты в файл пикл')
+<<<<<<< HEAD
 parser.add_argument('-p', '--path', help='Путь файла')
+=======
+parser.add_argument('-p', '--path', help='Путь файлаuli')
+>>>>>>> origin/main
 args = parser.parse_args()
 
 obj1 = class_file.MyClass(1, 2)
