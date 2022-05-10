@@ -3,13 +3,14 @@ import json
 from gettext import find
 from io import BytesIO
 import telebot  # pyTelegramBotAPI	4.3.1
-
+import random
+import html
 from telebot import types
 import requests
 import bs4   #beautifulsoup4
 import BotGames  # бот-игры, файл BotGames.py
 from menuBot import Menu  # в этом модуле есть код, создающий экземпляры классов описывающих моё меню
-import DZ  # домашнее задание от первого урока
+import DZ  # домашнее задание от первого уро
 
 bot = telebot.TeleBot('5285865621:AAHtiMAGGb4VRe-CLCtHFpR4cTTJENbzZRk')  # Создаем экземпляр бота
 game21 = None  # класс игры в 21, экземпляр создаём только при начале игры
@@ -165,27 +166,47 @@ def send_film(chat_id):
 
 # -----------------------------------------------------------------------
 def get_anekdot():
-    array_anekdots = []
-    req_anek = requests.get('http://anekdotme.ru/random')
-    if req_anek.status_code == 200:
-        soup = bs4.BeautifulSoup(req_anek.text, "html.parser")
-        result_find = soup.select('.anekdot_text')
-        for result in result_find:
-            array_anekdots.append(result.getText().strip())
-    if len(array_anekdots) > 0:
-        return array_anekdots[0]
-    else:
-        return ""
+#    array_anekdots = []
+#    req_anek = requests.get('http://anekdotme.ru/random')
+#    if req_anek.status_code == 200:
+#        soup = bs4.BeautifulSoup(req_anek.text, "html.parser")
+#        result_find = soup.select('.anekdot_text')
+#        for result in result_find:
+#            array_anekdots.append(result.getText().strip())
+#    if len(array_anekdots) > 0:
+#        return array_anekdots[0]
+#    else:
+#        return ""
+    array_quotes = []
+    answer = requests.get('https://zenquotes.io/api/random')
+    if answer.status_code == 200:
+         soup = bs4.BeautifulSoup(answer.text, "html.parser")
+         return soup
+#          result_find = soup.select('')
+#          for result in result_find:
+#         return soup.getText().strip()
+#     if len(array_quotes) > 0:
+#         return array_quotes[0]
+#     else:
+#         return ""
 
 # -----------------------------------------------------------------------
 def get_dogURL():
     url = ""
-    req = requests.get('https://random.dog/woof.json')
-    if req.status_code == 200:
-        r_json = req.json()
-        url = r_json['url']
+#    req = requests.get('https://random.dog/woof.json')
+#    req = requests.get('https://aws.random.cat/meow')
+    from requests import get
+    num = random.randint(1,1600)
+    source = get(f'https://aws.random.cat/view/{num}').text
+    if "id=\"cat" in source:
+        print(source.split("src=\"")[1].split("\"")[0])
+    else:
+        print("Incorrect id")
+#    if req.status_code == 200:
+#        r_json = req.json()
+#        url = r_json['url']
         # url.split("/")[-1]
-    return url
+#    return url
 # ---------------------------------------------------------------------
 def get_startup():
     array_startup = []
