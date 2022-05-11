@@ -42,8 +42,8 @@ def get_text_messages(message):
         if ms_text == "Помощь":
             send_help(chat_id)
 
-        elif ms_text == "Прислать собаку":
-            bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
+        elif ms_text == "Прислать котика":
+            bot.send_photo(chat_id, photo=get_catURL(), caption="Вот тебе котик, мяу!")
 
         elif ms_text == "Прислать идею стартапа":
             bot.send_message(chat_id, text=get_startup())
@@ -165,6 +165,7 @@ def send_film(chat_id):
 
 
 # -----------------------------------------------------------------------
+@bot.message_handler(content_types=['text'])
 def get_anekdot():
 #    array_anekdots = []
 #    req_anek = requests.get('http://anekdotme.ru/random')
@@ -180,8 +181,26 @@ def get_anekdot():
     array_quotes = []
     answer = requests.get('https://zenquotes.io/api/random')
     if answer.status_code == 200:
-         soup = bs4.BeautifulSoup(answer.text, "html.parser")
-         return soup
+        soup = bs4.BeautifulSoup(answer.text, "html.parser")
+        return soup
+
+#def get_anekdot(author, work, begin: str = "", end: str = ""):
+#     answer = requests.get('https://zenquotes.io/api/random')
+#     if answer.status_code == 200:
+ #       soup = bs4.BeautifulSoup(answer.text, "html.parser")
+        #if author not in list(lib.keys()):
+        #        return HTTPException(404)
+        #if work not in list(lib[author]):
+        #        return HTTPException(404)
+        #words = str(poems[work])
+        #if begin == "" or end == "":
+#            return soup(content=words, media_type="text/plain")
+	    #begin = words.find(begin)
+	    #end = words.rfind(end) + 1
+	    #if begin != -1 and end != 0 and begin <= end:
+		#        return answer(content=words[begin:end]+"\n", media_type="text/plain")
+	    #else:
+		#        return answer(content=words, media_type="text/plain")
 #          result_find = soup.select('')
 #          for result in result_find:
 #         return soup.getText().strip()
@@ -191,22 +210,42 @@ def get_anekdot():
 #         return ""
 
 # -----------------------------------------------------------------------
-def get_dogURL():
-    url = ""
+def get_catURL():
+#    url = ""
 #    req = requests.get('https://random.dog/woof.json')
 #    req = requests.get('https://aws.random.cat/meow')
-    from requests import get
-    num = random.randint(1,1600)
-    source = get(f'https://aws.random.cat/view/{num}').text
-    if "id=\"cat" in source:
-        print(source.split("src=\"")[1].split("\"")[0])
-    else:
-        print("Incorrect id")
+#    from requests import get
+#    num = random.randint(1,1600)
+#    source = get(f'https://aws.random.cat/view/{num}').text
+#    if "id=\"cat" in source:
+#        print(source.split("src=\"")[1].split("\"")[0])
+#    else:
+#        print("Incorrect id")
 #    if req.status_code == 200:
 #        r_json = req.json()
 #        url = r_json['url']
         # url.split("/")[-1]
 #    return url
+    img = (requests.get("https://aws.random.cat/meow").json())["file"]
+    res = requests.get(img)
+    return res.content
+#    url = ""
+#    req = requests.get('https://aws.random.cat/meow')
+#    r_json = req.json()
+#    url = r_json['url']
+        # url.split("/")[-1]
+#    return url
+
+#    querystring = {"top":"Top Text","bottom":"Bottom Text","meme":"Condescending-Wonka","font_size":"50","font":"Impact"}
+
+#    headers = {
+#	    "X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com",
+#	    "X-RapidAPI-Key": "SIGN-UP-FOR-KEY"
+#}
+
+#     response = requests.request("GET", url, headers=headers, params=querystring)
+
+#    return response
 # ---------------------------------------------------------------------
 def get_startup():
     array_startup = []
