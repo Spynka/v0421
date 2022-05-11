@@ -48,8 +48,8 @@ def get_text_messages(message):
         elif ms_text == "Прислать идею стартапа":
             bot.send_message(chat_id, text=get_startup())
 
-        elif ms_text == "Прислать анекдот":
-            bot.send_message(chat_id, text=get_anekdot())
+        elif ms_text == "Прислать цитату на Eng":
+            bot.send_message(chat_id, text=get_quote())
 
         elif ms_text == "Прислать фильм":
             send_film(chat_id)
@@ -166,7 +166,7 @@ def send_film(chat_id):
 
 # -----------------------------------------------------------------------
 @bot.message_handler(content_types=['text'])
-def get_anekdot():
+def get_quote():
 #    array_anekdots = []
 #    req_anek = requests.get('http://anekdotme.ru/random')
 #    if req_anek.status_code == 200:
