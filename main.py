@@ -46,7 +46,7 @@ def get_text_messages(message):
             bot.send_photo(chat_id, photo=get_catURL(), caption="Вот тебе котик, мяу!")
 
         elif ms_text == "Прислать идею стартапа":
-            bot.send_message(chat_id, text=get_startup())
+            bot.send_message(chat_id, text=get_startup(chat_id))
 
         elif ms_text == "Прислать цитату на Eng":
             bot.send_message(chat_id, text=get_quote())
@@ -178,7 +178,7 @@ def get_quote():
 #        return array_anekdots[0]
 #    else:
 #        return ""
-    array_quotes = []
+#    array_quotes = []
     answer = requests.get('https://zenquotes.io/api/random')
     if answer.status_code == 200:
         soup = bs4.BeautifulSoup(answer.text, "html.parser")
@@ -229,7 +229,7 @@ def get_catURL():
     img = (requests.get("https://aws.random.cat/meow").json())["file"]
     res = requests.get(img)
     return res.content
-#    url = ""
+#     url = ""
 #    req = requests.get('https://aws.random.cat/meow')
 #    r_json = req.json()
 #    url = r_json['url']
@@ -247,13 +247,25 @@ def get_catURL():
 
 #    return response
 # ---------------------------------------------------------------------
-def get_startup():
-    array_startup = []
-    req = requests.get('http://itsthisforthat.com/api.php?json')
-    if req.status_code == 200:
-        r1_json = req.json()
-        a = r1_json['']
-    return ""
+def get_startup(chat_id):
+     global bot
+     bot.send_message(chat_id, text="генерирую новые идеи с помощью двух случайных параметров на Eng")
+     startup = requests.get('http://itsthisforthat.com/api.php?json')
+     stup = bs4.BeautifulSoup(startup.text, "html.parser")
+     return  stup
+
+
+#     array_startup = []
+#     startup = requests.get('http://itsthisforthat.com/api.php?json')
+ #    if startup.status_code == 200:
+  #       soup1 = bs4.BeautifulSoup(startup.text, "html.parser")
+  #       result_find = soup1.select('this')
+  #       for result in result_find:
+ #            array_startup.append(result.getText().strip())
+ #    if len(array_startup) > 0:
+ #        return array_startup[0]
+    # else:
+   #      return ""
 
 
 # -----------------------------------------------------------------------
