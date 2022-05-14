@@ -5,6 +5,9 @@ from io import BytesIO
 import telebot  # pyTelegramBotAPI	4.3.1
 import random
 import html
+
+from telegram import ParseMode
+
 from telebot import types
 import requests
 import bs4   #beautifulsoup4
@@ -46,10 +49,10 @@ def get_text_messages(message):
             bot.send_photo(chat_id, photo=get_catURL(), caption="Вот тебе котик, мяу!")
 
         elif ms_text == "Прислать идею стартапа":
-            bot.send_message(chat_id, text=get_startup(chat_id))
+            bot.send_message(chat_id, text=get_startup(chat_id), parse_mode='html')
 
         elif ms_text == "Прислать цитату на Eng":
-            bot.send_message(chat_id, text=get_quote())
+            bot.send_message(chat_id, text=get_quote(), parse_mode=ParseMode.HTML)
 
         elif ms_text == "Прислать фильм":
             send_film(chat_id)
@@ -252,6 +255,7 @@ def get_startup(chat_id):
      bot.send_message(chat_id, text="генерирую новые идеи с помощью двух случайных параметров на Eng")
      startup = requests.get('http://itsthisforthat.com/api.php?json')
      stup = bs4.BeautifulSoup(startup.text, "html.parser")
+     parse_mode=ParseMode.HTML
      return  stup
 
 
