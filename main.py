@@ -5,7 +5,7 @@ from io import BytesIO
 import telebot  # pyTelegramBotAPI	4.3.1
 import random
 import html
-
+import logging
 from telegram import ParseMode
 
 from telebot import types
@@ -55,7 +55,7 @@ def get_text_messages(message):
             bot.send_message(chat_id, text=get_quote(), parse_mode=ParseMode.HTML)
 
         elif ms_text == "Прислать фильм":
-            send_film(chat_id)
+            parse_page(chat_id)
 
         elif ms_text == "Угадай кто?":
             get_ManOrNot(chat_id)
@@ -151,20 +151,77 @@ def send_help(chat_id):
     markup.add(btn1)
     img = open('AVA.jpg', 'rb')
     bot.send_photo(chat_id, img, reply_markup=markup)
+#---------------------------------------------------------------------
 
+
+class Client:
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.141 YaBrowser/22.3.4.731 Yowser/2.5 Safari/537.36'
+        }
+        self.result=[]
+    def load_page(self, page: int = None):
+        url = 'https://www.wildberries.ru/promotions/bestsellery-nedeli'
+        res = self.session.get (url=url)
+        res.raise_for_status()
+        return res.text
+
+    def parse_page(self,text:str):
+        soup = bs4.BeautifulSoup(text,'lxml')
+        container = soup.select ('div.product-card j-card-item j-good-for-listing-event')
+        for block in container:
+            self.parse_block(block=block)
+
+ #   def parse_block(self, block):
+#        logger.info(block)
+#        logger.info('='*100)
+
+        url_block = block.select_one('a.product-card__main j-card-link')
+        if not url_block:
+            logger.error('no_url_block')
+            return
+
+        url = url_block.get('href')
+        if not url:
+            logger.error('no href')
+            return
+        name_block = block.select_one('div.product-card__brand-name')
+        if not name_block:
+            logger.error(f'no name_block on {url}')
+            return
+        brand_name = name_block.select_one('strong.brand-name')
+        if not brand_name:
+            logger.error(f'no brand_name on {url}')
+            return
+        brand_name = brand_name.text
+        brand_name = brand_name.replace('/','').strip()
+
+        goods_name=name_block.select_one('span.goods-name')
+        if not goods_name:
+            logger.error(f'no goods_name on {url}')
+            return
+        info_str = f"Ссылка:<b>{url}</b>\n" \
+               f"Бренд: {brand_name}\n" \
+               f"Наименование: {goots_name}\n"
+        bot.send_photo(chat_id, caption=info_str, parse_mode='HTML')
 # -----------------------------------------------------------------------
-def send_film(chat_id):
-    film = get_randomFilm()
-    info_str = f"<b>{film['Наименование']}</b>\n" \
-               f"Год: {film['Год']}\n" \
-               f"Страна: {film['Страна']}\n" \
-               f"Жанр: {film['Жанр']}\n" \
-               f"Продолжительность: {film['Продолжительность']}"
-    markup = types.InlineKeyboardMarkup()
-    btn1 = types.InlineKeyboardButton(text="Трейлер", url=film["Трейлер_url"])
-    btn2 = types.InlineKeyboardButton(text="СМОТРЕТЬ онлайн", url=film["фильм_url"])
-    markup.add(btn1, btn2)
-    bot.send_photo(chat_id, photo=film['Обложка_url'], caption=info_str, parse_mode='HTML', reply_markup=markup)
+#def send_film(chat_id):
+#    film = get_randomFilm()
+#    info_str = f"<b>{film['Наименование']}</b>\n" \
+#               f"Год: {film['Год']}\n" \
+#               f"Страна: {film['Страна']}\n" \
+#               f"Жанр: {film['Жанр']}\n" \
+#               f"Продолжительность: {film['Продолжительность']}"
+#    markup = types.InlineKeyboardMarkup()
+#    btn1 = types.InlineKeyboardButton(text="Трейлер", url=film["Трейлер_url"])
+#    btn2 = types.InlineKeyboardButton(text="СМОТРЕТЬ онлайн", url=film["фильм_url"])
+#    markup.add(btn1, btn2)
+#    bot.send_photo(chat_id, photo=film['Обложка_url'], caption=info_str, parse_mode='HTML', reply_markup=markup)
+
+
+
+
 
 
 # -----------------------------------------------------------------------
@@ -250,6 +307,9 @@ def get_catURL():
 
 #    return response
 # ---------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+
 def get_startup(chat_id):
      global bot
      bot.send_message(chat_id, text="генерирую новые идеи с помощью двух случайных параметров на Eng")
@@ -286,34 +346,36 @@ def get_ManOrNot(chat_id):
         bot.send_photo(chat_id, photo=img, reply_markup=markup, caption="Этот человек реален?")
 
 # ---------------------------------------------------------------------
-def get_randomFilm():
-    url = 'https://randomfilm.ru/'
-    infoFilm = {}
-    req_film = requests.get(url)
-    soup = bs4.BeautifulSoup(req_film.text, "html.parser")
-    result_find = soup.find('div', align="center", style="width: 100%")
-    infoFilm["Наименование"] = result_find.find("h2").getText()
-    names = infoFilm["Наименование"].split(" / ")
-    infoFilm["Наименование_rus"] = names[0].strip()
-    if len(names) > 1:
-        infoFilm["Наименование_eng"] = names[1].strip()
+#def get_randomFilm():
+#    url = 'https://randomfilm.ru/'
+#    infoFilm = {}
+#    req_film = requests.get(url)
+#    soup = bs4.BeautifulSoup(req_film.text, "html.parser")
+#    result_find = soup.find('div', align="center", style="width: 100%")
+#    infoFilm["Наименование"] = result_find.find("h2").getText()
+#    names = infoFilm["Наименование"].split(" / ")
+#    infoFilm["Наименование_rus"] = names[0].strip()
+#    if len(names) > 1:
+#        infoFilm["Наименование_eng"] = names[1].strip()
 
-    images = []
-    for img in result_find.findAll('img'):
-        images.append(url + img.get('src'))
-    infoFilm["Обложка_url"] = images[0]
+#    images = []
+#    for img in result_find.findAll('img'):
+#        images.append(url + img.get('src'))
+#    infoFilm["Обложка_url"] = images[0]
 
-    details = result_find.findAll('td')
-    infoFilm["Год"] = details[0].contents[1].strip()
-    infoFilm["Страна"] = details[1].contents[1].strip()
-    infoFilm["Жанр"] = details[2].contents[1].strip()
-    infoFilm["Продолжительность"] = details[3].contents[1].strip()
-    infoFilm["Режиссёр"] = details[4].contents[1].strip()
-    infoFilm["Актёры"] = details[5].contents[1].strip()
-    infoFilm["Трейлер_url"] = url + details[6].contents[0]["href"]
-    infoFilm["фильм_url"] = url + details[7].contents[0]["href"]
+#    details = result_find.findAll('td')
+#    infoFilm["Год"] = details[0].contents[1].strip()
+#    infoFilm["Страна"] = details[1].contents[1].strip()
+#    infoFilm["Жанр"] = details[2].contents[1].strip()
+#    infoFilm["Продолжительность"] = details[3].contents[1].strip()
+#    infoFilm["Режиссёр"] = details[4].contents[1].strip()
+#    infoFilm["Актёры"] = details[5].contents[1].strip()
+#    infoFilm["Трейлер_url"] = url + details[6].contents[0]["href"]
+#    infoFilm["фильм_url"] = url + details[7].contents[0]["href"]
 
-    return infoFilm
+#    return infoFilm
+    return url_block
+
 # ---------------------------------------------------------------------
 
 

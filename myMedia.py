@@ -51,12 +51,15 @@
 #        infoFilm["Актёры"] = details[5].contents[1].strip()
 #        infoFilm["Трейлеры_url"] = url + details[6].contents[0]["href"]
 #        infoFilm["фильм_url"] = url + details[7].contents[0]["href"]
-import bs4
-import requests
 import logging
 import collections
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('wb')
+import bs4
+import requests
+
+
+logger = logging.getLogger('__name__')
+logger.setLevel(logging.DEBUG)
+
 
 ParseResult= collections.namedtuple(
     'ParseResult',
@@ -110,12 +113,16 @@ class Client:
         brand_name = brand_name.text
         brand_name = brand_name.replace('/','').strip()
 
+        goods_name=name_block.select_one('span.goods-name')
+        if not goods_name:
+            logger.error(f'no goods_name on {url}')
+            return
 
-        print( url, brand_name)
-
- #   def run(self):
- #       text = self.load_page()
-  #      self.parse_page(text=text)
+        logger.info(brand_name)
+#def run(self):
+#    text = self.load_page()
+#    self.parse_page(text=text)
+#    logger.info(url, brand_name, goods_name)
 
 #if __name__==' __main__':
  #   parser = Client()
