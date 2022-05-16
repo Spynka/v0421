@@ -54,8 +54,11 @@ def get_text_messages(message):
         elif ms_text == "Прислать цитату на Eng":
             bot.send_message(chat_id, text=get_quote(), parse_mode=ParseMode.HTML)
 
-        elif ms_text == "Прислать фильм":
+        elif ms_text == "Прислать геймпад":
             user_text(chat_id,message)
+            parser(chat_id,message)
+
+
 
         elif ms_text == "Угадай кто?":
             get_ManOrNot(chat_id)
@@ -99,7 +102,7 @@ def get_text_messages(message):
     else:  # ...........................................................................................................
        bot.send_message(chat_id, text="Мне жаль, я не понимаю вашу команду: " + ms_text)
        goto_menu(chat_id, "Главное меню")
-
+    flag = True
 # -----------------------------------------------------------------------
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
@@ -156,14 +159,14 @@ def send_help(chat_id):
 #---------------------------------------------------------------------
 @bot.message_handler(content_types=['text'])
 def user_text(chat_id, message):
-    bot.send_message(message.chat.id, """
-            Привет! Я позволяю быстро находить нужные товары в 
-
-            Для того, чтобы я отправил тебе товар, введи в поле его название...""",
+    chat_id = message.chat.id
+    ms_text = message.text
+    bot.send_message(chat_id, """
+            Привет! Смотри какие геймпады классные на Е-каталоге нашел""",
                     parse_mode="html")
-def parser(chat_id, message):
+def parser(chat_id, ms_text):
 
-    url = "https://kz.e-katalog.com/ek-list.php?search_=" + message.text
+    url = "https://kz.e-katalog.com/ek-list.php?katalog_=200&pr_[]=841&sb_=Геймпад"
     request = requests.get(url)
     soup = bs4.BeautifulSoup(request.text, "html.parser")
 
@@ -183,64 +186,14 @@ def parser(chat_id, message):
         img = "https://kz.e-katalog.com/" + img["src"]
 
         bot.send_photo(chat_id, img,
-                    caption="<b>" + name + "</b>\n<i>" + price + f"</i>\n<a href='{url}'>Ссфлка на сайт</a>",
+                    caption="<b>" + name + "</b>\n<i>" + price + f"</i>\n<a href='{url}'>Ссылка на сайт</a>",
                     parse_mode='HTML')
 
-        if all_links.index(link) == 2:
+        if all_links.index(link) == 3:
             break
 #---------------------------------------------------------------------
 
-class Client:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.141 YaBrowser/22.3.4.731 Yowser/2.5 Safari/537.36'
-        }
-        self.result=[]
-    def load_page(self, page: int = None):
-        url = 'https://www.wildberries.ru/promotions/bestsellery-nedeli'
-        res = self.session.get (url=url)
-        res.raise_for_status()
-        return res.text
 
-    def parse_page(self,text:str):
-        soup = bs4.BeautifulSoup(text,'lxml')
-        container = soup.select ('div.product-card j-card-item j-good-for-listing-event')
-        for block in container:
-            self.parse_block(block=block)
-
- #   def parse_block(self, block):
-#        logger.info(block)
-#        logger.info('='*100)
-
-        url_block = block.select_one('a.product-card__main j-card-link')
-        if not url_block:
-            logger.error('no_url_block')
-            return
-
-        url = url_block.get('href')
-        if not url:
-            logger.error('no href')
-            return
-        name_block = block.select_one('div.product-card__brand-name')
-        if not name_block:
-            logger.error(f'no name_block on {url}')
-            return
-        brand_name = name_block.select_one('strong.brand-name')
-        if not brand_name:
-            logger.error(f'no brand_name on {url}')
-            return
-        brand_name = brand_name.text
-        brand_name = brand_name.replace('/','').strip()
-
-        goods_name=name_block.select_one('span.goods-name')
-        if not goods_name:
-            logger.error(f'no goods_name on {url}')
-            return
-        info_str = f"Ссылка:<b>{url}</b>\n" \
-               f"Бренд: {brand_name}\n" \
-               f"Наименование: {goots_name}\n"
-        bot.send_photo(chat_id, caption=info_str, parse_mode='HTML')
 # -----------------------------------------------------------------------
 #def send_film(chat_id):
 #    film = get_randomFilm()
@@ -278,7 +231,9 @@ def get_quote():
     answer = requests.get('https://zenquotes.io/api/random')
     if answer.status_code == 200:
         soup = bs4.BeautifulSoup(answer.text, "html.parser")
-        return soup
+        soup = soup.text
+        soup_new = soup.replace('[{"q":', '').strip()
+        return soup_new
 
 #def get_anekdot(author, work, begin: str = "", end: str = ""):
 #     answer = requests.get('https://zenquotes.io/api/random')
@@ -307,8 +262,16 @@ def get_quote():
 
 # -----------------------------------------------------------------------
 def get_catURL():
+     # making a GET request to the endpoint.
+     resp = requests.get("https://some-random-api.ml/animal/cat")
+     # checking if resp has a healthy status code.
+     if 300 > resp.status_code >= 200:
+         content = resp.json()  # We have a dict now.
+     else:
+         content = f"Recieved a bad status code of {resp.status_code}."
+     return content
 #    url = ""
-#    req = requests.get('https://random.dog/woof.json')
+#    req = requests.get('https://randomfox.ca/floof')
 #    req = requests.get('https://aws.random.cat/meow')
 #    from requests import get
 #    num = random.randint(1,1600)
@@ -322,9 +285,9 @@ def get_catURL():
 #        url = r_json['url']
         # url.split("/")[-1]
 #    return url
-    img = (requests.get("https://aws.random.cat/meow").json())["file"]
-    res = requests.get(img)
-    return res.content
+#    img = (requests.get("https://randomfox.ca/floof/").json())["file"]
+#    res = requests.get(img)
+#    return res.content
 #     url = ""
 #    req = requests.get('https://aws.random.cat/meow')
 #    r_json = req.json()
