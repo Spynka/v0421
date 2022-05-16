@@ -55,7 +55,7 @@ def get_text_messages(message):
             bot.send_message(chat_id, text=get_quote(), parse_mode=ParseMode.HTML)
 
         elif ms_text == "Прислать фильм":
-            parse_page(chat_id)
+            user_text(chat_id,message)
 
         elif ms_text == "Угадай кто?":
             get_ManOrNot(chat_id)
@@ -97,8 +97,8 @@ def get_text_messages(message):
             DZ.dz6(bot, chat_id)
 
     else:  # ...........................................................................................................
-        bot.send_message(chat_id, text="Мне жаль, я не понимаю вашу команду: " + ms_text)
-        goto_menu(chat_id, "Главное меню")
+       bot.send_message(chat_id, text="Мне жаль, я не понимаю вашу команду: " + ms_text)
+       goto_menu(chat_id, "Главное меню")
 
 # -----------------------------------------------------------------------
 @bot.callback_query_handler(func=lambda call: True)
@@ -111,6 +111,8 @@ def callback_worker(call):
     #     bot.answer_callback_query(call.id)
 
 # -----------------------------------------------------------------------
+
+#------------------------------------------------------------------------
 def goto_menu(chat_id, name_menu):
     # получение нужного элемента меню
     if name_menu == "Выход" and Menu.cur_menu != None and Menu.cur_menu.parent != None:
@@ -152,7 +154,41 @@ def send_help(chat_id):
     img = open('AVA.jpg', 'rb')
     bot.send_photo(chat_id, img, reply_markup=markup)
 #---------------------------------------------------------------------
+@bot.message_handler(content_types=['text'])
+def user_text(chat_id, message):
+    bot.send_message(message.chat.id, """
+            Привет! Я позволяю быстро находить нужные товары в 
 
+            Для того, чтобы я отправил тебе товар, введи в поле его название...""",
+                    parse_mode="html")
+def parser(chat_id, message):
+
+    url = "https://kz.e-katalog.com/ek-list.php?search_=" + message.text
+    request = requests.get(url)
+    soup = bs4.BeautifulSoup(request.text, "html.parser")
+
+    all_links = soup.find_all("a", class_="model-short-title")
+    for link in all_links:
+        url = "https://kz.e-katalog.com/" + link["href"]
+        request = requests.get(url)
+        soup = bs4.BeautifulSoup(request.text, "html.parser")
+
+        name = soup.find("div", class_="fix-menu-name")
+        price = name.find("a").text
+        name.find("a").extract()
+        name = name.text
+
+        img = soup.find("div", class_="img200")
+        img = img.findChildren("img")[0]
+        img = "https://kz.e-katalog.com/" + img["src"]
+
+        bot.send_photo(chat_id, img,
+                    caption="<b>" + name + "</b>\n<i>" + price + f"</i>\n<a href='{url}'>Ссфлка на сайт</a>",
+                    parse_mode='HTML')
+
+        if all_links.index(link) == 2:
+            break
+#---------------------------------------------------------------------
 
 class Client:
     def __init__(self):
