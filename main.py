@@ -45,14 +45,15 @@ def get_text_messages(message):
         if ms_text == "Помощь":
             send_help(chat_id)
 
-        elif ms_text == "Прислать котика":
-            bot.send_photo(chat_id, photo=get_catURL(), caption="Вот тебе котик, мяу!")
+        elif ms_text == "Прислать лисичку":
+            bot.send_photo(chat_id, photo=getImgFox(), caption="Вот тебе лисичка, фыр-фыр!")
 
         elif ms_text == "Прислать идею стартапа":
             bot.send_message(chat_id, text=get_startup(chat_id), parse_mode='html')
 
         elif ms_text == "Прислать цитату на Eng":
-            bot.send_message(chat_id, text=get_quote(), parse_mode=ParseMode.HTML)
+            get_quote(chat_id)
+ #           bot.send_message(chat_id, text=get_quote(), parse_mode=ParseMode.HTML)
 
         elif ms_text == "Прислать геймпад":
             Catalog(chat_id)
@@ -215,7 +216,7 @@ def parser(chat_id, ms_text):
 
 # -----------------------------------------------------------------------
 @bot.message_handler(content_types=['text'])
-def get_quote():
+def get_quote(chat_id):
 #    array_anekdots = []
 #    req_anek = requests.get('http://anekdotme.ru/random')
 #    if req_anek.status_code == 200:
@@ -231,9 +232,10 @@ def get_quote():
     answer = requests.get('https://zenquotes.io/api/random')
     if answer.status_code == 200:
         soup = bs4.BeautifulSoup(answer.text, "html.parser")
-        soup = soup.text
-        soup_new = soup.replace('[{"q":', '').strip()
-        return soup_new
+#        soup = soup.text
+#        soup_new = soup.replace('[{"q":', '').strip()
+#        return soup
+        bot.send_message(chat_id, soup,parse_mode="html")
 
 #def get_anekdot(author, work, begin: str = "", end: str = ""):
 #     answer = requests.get('https://zenquotes.io/api/random')
@@ -261,15 +263,34 @@ def get_quote():
 #         return ""
 
 # -----------------------------------------------------------------------
-def get_catURL():
+import os
+import requests as rq
+from random import randint
+
+def getImgFox():
+    img = rq.get("https://randomfox.ca/floof/")
+    if img.status_code != 200:
+        return img
+    img = img.json()["image"]
+    res = rq.get(img)
+    if res.status_code != 200:
+        return res
+    bImg = res.content
+    if not os.path.isdir("foxsImg"):
+        os.mkdir("foxsImg")
+    with open("foxsImg/" + str(randint(0, 2048)) + ".jpg", "wb") as f:
+        f.write(bImg)
+        f.close()
+        return bImg
+getImgFox()
      # making a GET request to the endpoint.
-     resp = requests.get("https://some-random-api.ml/animal/cat")
+#     resp = requests.get("https://some-random-api.ml/animal/cat")
      # checking if resp has a healthy status code.
-     if 300 > resp.status_code >= 200:
-         content = resp.json()  # We have a dict now.
-     else:
-         content = f"Recieved a bad status code of {resp.status_code}."
-     return content
+#     if 300 > resp.status_code >= 200:
+#         content = resp.json()  # We have a dict now.
+#     else:
+#         content = f"Recieved a bad status code of {resp.status_code}."
+#     return content
 #    url = ""
 #    req = requests.get('https://randomfox.ca/floof')
 #    req = requests.get('https://aws.random.cat/meow')
@@ -313,9 +334,8 @@ def get_startup(chat_id):
      global bot
      bot.send_message(chat_id, text="генерирую новые идеи с помощью двух случайных параметров на Eng")
      startup = requests.get('http://itsthisforthat.com/api.php?json')
-     stup = bs4.BeautifulSoup(startup.text, "html.parser")
-     parse_mode=ParseMode.HTML
-     return  stup
+     soup = bs4.BeautifulSoup(startup.text, "html.parser")
+     return  soup
 
 
 #     array_startup = []
@@ -373,7 +393,7 @@ def get_ManOrNot(chat_id):
 #    infoFilm["фильм_url"] = url + details[7].contents[0]["href"]
 
 #    return infoFilm
-    return url_block
+#    return url_block
 
 # ---------------------------------------------------------------------
 
