@@ -55,8 +55,8 @@ def get_text_messages(message):
             bot.send_message(chat_id, text=get_quote(), parse_mode=ParseMode.HTML)
 
         elif ms_text == "Прислать геймпад":
-            user_text(chat_id,message)
-            parser(chat_id,message)
+            Catalog(chat_id)
+            parser(chat_id,ms_text)
 
 
 
@@ -102,7 +102,8 @@ def get_text_messages(message):
     else:  # ...........................................................................................................
        bot.send_message(chat_id, text="Мне жаль, я не понимаю вашу команду: " + ms_text)
        goto_menu(chat_id, "Главное меню")
-    flag = True
+
+
 # -----------------------------------------------------------------------
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
@@ -157,13 +158,12 @@ def send_help(chat_id):
     img = open('AVA.jpg', 'rb')
     bot.send_photo(chat_id, img, reply_markup=markup)
 #---------------------------------------------------------------------
-@bot.message_handler(content_types=['text'])
-def user_text(chat_id, message):
-    chat_id = message.chat.id
-    ms_text = message.text
+def Catalog(chat_id):
     bot.send_message(chat_id, """
-            Привет! Смотри какие геймпады классные на Е-каталоге нашел""",
-                    parse_mode="html")
+                       Привет! Смотри какие геймпады классные на Е-каталоге нашел""",
+                        parse_mode="html")
+
+
 def parser(chat_id, ms_text):
 
     url = "https://kz.e-katalog.com/ek-list.php?katalog_=200&pr_[]=841&sb_=Геймпад"
